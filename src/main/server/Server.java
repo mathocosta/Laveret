@@ -1,15 +1,16 @@
 package main.server;
 
-import java.io.BufferedInputStream;
-import java.io.DataInputStream;
 import java.io.IOException;
+import java.io.ObjectInputStream;
 import java.net.ServerSocket;
 import java.net.Socket;
+
+import main.util.InfoBundle;
 
 public class Server {
   private Socket socket = null;
   private ServerSocket server = null;
-  private DataInputStream streamIn = null;
+  private ObjectInputStream streamIn = null;
 
 
   public Server (int port) {
@@ -26,26 +27,30 @@ public class Server {
       boolean done = false;
       while (!done) {
         try {
-          String line = streamIn.readUTF();
-          System.out.println(line);
-          done = line.equals(".bye");
+          InfoBundle bundle = (InfoBundle) streamIn.readObject();
+          System.out.println(bundle.getQuestionAnswer());
         } catch (IOException e) {
+          done = true;
+        } catch (ClassNotFoundException e) {
+          e.printStackTrace();
           done = true;
         }
       }
 
       close();
     } catch (IOException e) {
-      System.out.println(e);
+      System.out.println(e.getMessage());
     }
   }
 
 
+  // Inicia o recebimento do que vem do cliente
   public void open () throws IOException {
-    streamIn = new DataInputStream(new BufferedInputStream(socket.getInputStream()));
+    streamIn = new ObjectInputStream(socket.getInputStream());
   }
 
 
+  // Encerra todos os processos
   public void close () throws IOException {
     if (socket != null)
       socket.close();
@@ -53,4 +58,8 @@ public class Server {
       streamIn.close();
   }
 
+  // main para não precisar do 'TesteServer.java'
+  // public static void main (String[] args) {
+  // new Server(12345);
+  // }
 }

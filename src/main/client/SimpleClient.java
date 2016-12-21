@@ -1,16 +1,18 @@
 package main.client;
 
 import java.io.BufferedReader;
-import java.io.DataOutputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.io.ObjectOutputStream;
 import java.net.Socket;
 import java.net.UnknownHostException;
+
+import main.util.InfoBundle;
 
 public class SimpleClient {
   private Socket socket = null;
   private BufferedReader console = null;
-  private DataOutputStream streamOut = null;
+  private ObjectOutputStream streamOut = null;
 
 
   public SimpleClient (String serverName, int serverPort) {
@@ -30,8 +32,8 @@ public class SimpleClient {
     while (!line.equals(".bye")) {
       try {
         line = console.readLine();
-        streamOut.writeUTF(line);
-        streamOut.flush();
+        InfoBundle bundle = new InfoBundle(line);
+        streamOut.writeObject(bundle);
       } catch (IOException e) {
         System.out.println("Erro de envio: " + e.getMessage());
       }
@@ -41,7 +43,7 @@ public class SimpleClient {
 
   public void start () throws IOException {
     console = new BufferedReader(new InputStreamReader(System.in));
-    streamOut = new DataOutputStream(socket.getOutputStream());
+    streamOut = new ObjectOutputStream(socket.getOutputStream());
   }
 
 
