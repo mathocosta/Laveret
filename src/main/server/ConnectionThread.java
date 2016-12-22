@@ -2,6 +2,7 @@ package main.server;
 
 import java.io.IOException;
 import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.net.Socket;
 
 import main.util.InfoBundle;
@@ -11,16 +12,17 @@ import main.util.InfoBundle;
  * sua devida thread.
  */
 // TODO:FIXME: Pesquisar se eh essa a forma certa, bem como senao for, como
-//  fazer somente com o Runnable
-public class ThreadConnection extends Thread {
+// fazer somente com o Runnable
+public class ConnectionThread extends Thread {
   private Socket socket = null;
   @SuppressWarnings("unused")
   private Server server = null;
   private int ID = -1;
   private ObjectInputStream streamIn = null;
+  private ObjectOutputStream streamOut = null;
 
 
-  public ThreadConnection (Server _server, Socket _socket) {
+  public ConnectionThread (Server _server, Socket _socket) {
     server = _server;
     socket = _socket;
     ID = socket.getPort();
@@ -33,7 +35,8 @@ public class ThreadConnection extends Thread {
     while (true) {
       try {
         InfoBundle bundle = (InfoBundle) streamIn.readObject();
-        System.out.println(bundle.getQuestionAnswer());
+        System.out.println(ID + ": " + bundle.getQuestionAnswer());
+
       } catch (IOException e) {
         System.out.println(e.getMessage());
       } catch (ClassNotFoundException e) {
@@ -43,15 +46,35 @@ public class ThreadConnection extends Thread {
   }
 
 
-  public void open () throws IOException {
-    streamIn = new ObjectInputStream(socket.getInputStream());
+  /**
+   * @return the iD
+   */
+  public int getID () {
+    return ID;
   }
 
 
+  /**
+   * Inicia o recebimento(Input) pela conexão.
+   * 
+   * @throws IOException
+   */
+  public void open () throws IOException {
+    streamIn = new ObjectInputStream(socket.getInputStream());
+    streamOut = new ObjectOutputStream(socket.getOutputStream());
+  }
+
+
+  /**
+   * Fecha a conexão com o socket e a ObjectInputStream da conexão.
+   * 
+   * @throws IOException
+   */
   public void close () throws IOException {
     if (socket != null)
       socket.close();
     if (streamIn != null)
       streamIn.close();
   }
+
 }
