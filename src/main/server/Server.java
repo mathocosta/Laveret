@@ -1,16 +1,13 @@
 package main.server;
 
 import java.io.IOException;
-import java.io.ObjectInputStream;
 import java.net.ServerSocket;
 import java.net.Socket;
 
-import main.util.InfoBundle;
-
-public class Server {
-  private Socket socket = null;
+public class Server implements Runnable {
+  private Thread thread = null;
   private ServerSocket server = null;
-  private ObjectInputStream streamIn = null;
+  private ThreadConnection client = null;
 
 
   public Server (int port) {
@@ -18,44 +15,54 @@ public class Server {
       System.out.println("Iniciando na porta " + port + " aguarde ...");
       server = new ServerSocket(port);
       System.out.println("Servidor iniciado: " + server);
-      System.out.println("Esperando um cliente...");
-
-      socket = server.accept();
-      System.out.println("Cliente aceito: " + socket);
-      open();
-
-      boolean done = false;
-      while (!done) {
-        try {
-          InfoBundle bundle = (InfoBundle) streamIn.readObject();
-          System.out.println(bundle.getQuestionAnswer());
-        } catch (IOException e) {
-          done = true;
-        } catch (ClassNotFoundException e) {
-          e.printStackTrace();
-          done = true;
-        }
-      }
-
-      close();
+      start();
     } catch (IOException e) {
       System.out.println(e.getMessage());
     }
   }
 
 
-  // Inicia o recebimento do que vem do cliente
-  public void open () throws IOException {
-    streamIn = new ObjectInputStream(socket.getInputStream());
+  private void start () {
+    if (thread == null) {
+      thread = new Thread(this);
+      thread.start();
+    }
+
   }
 
 
-  // Encerra todos os processos
-  public void close () throws IOException {
-    if (socket != null)
-      socket.close();
-    if (streamIn != null)
-      streamIn.close();
+  public void stop () {
+    if (thread != null) {
+      thread.interrupt();
+      thread = null;
+    }
+  }
+
+
+  @Override
+  public void run () {
+    while (thread != null) {
+      try {
+        System.out.println("Esperando um cliente...");
+        addThreadConnection(server.accept());
+      } catch (IOException e1) {
+        e1.printStackTrace();
+      }
+    }
+
+  }
+
+
+  private void addThreadConnection (Socket accept) {
+    System.out.println("Cliente aceito: " + accept);
+    client = new ThreadConnection(this, accept);
+    try {
+      client.open();
+      client.start();
+    } catch (IOException e) {
+      e.printStackTrace();
+    }
+
   }
 
   // main para não precisar do 'TesteServer.java'
