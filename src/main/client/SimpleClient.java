@@ -13,7 +13,7 @@ public class SimpleClient {
   private Socket socket = null;
   private BufferedReader console = null;
   private ObjectOutputStream streamOut = null;
-
+  private Thread receiverThread = null;
 
   public SimpleClient (String serverName, int serverPort) {
     System.out.println("Tentando conexão..");
@@ -44,6 +44,8 @@ public class SimpleClient {
   public void start () throws IOException {
     console = new BufferedReader(new InputStreamReader(System.in));
     streamOut = new ObjectOutputStream(socket.getOutputStream());
+    Receiver receiver = new Receiver(this, socket);
+    new Thread(receiver).start();
   }
 
 
@@ -55,8 +57,20 @@ public class SimpleClient {
         streamOut.close();
       if (socket != null)
         socket.close();
+      if (receiverThread != null)
+        receiverThread.interrupt();
     } catch (IOException ioe) {
       System.out.println("Erro encerrando ...");
+    }
+  }
+  
+  public void handleCommunication (InfoBundle receivedBundle) {
+    if (receivedBundle.getQuestionAnswer().equals(".bye")) {
+      System.out.println("Desconectando, pressione enter...");
+      stop();
+      
+    } else {
+      System.out.println(receivedBundle.getQuestionAnswer());
     }
   }
 }
