@@ -15,7 +15,6 @@ import main.util.InfoBundle;
 // fazer somente com o Runnable
 public class ConnectionThread extends Thread {
   private Socket socket = null;
-  @SuppressWarnings("unused")
   private Server server = null;
   private int ID = -1;
   private ObjectInputStream streamIn = null;
@@ -32,11 +31,12 @@ public class ConnectionThread extends Thread {
   @Override
   public void run () {
     System.out.println("Connection " + ID + " running");
-    while (true) {
+    while (!this.isInterrupted()) {
       try {
         InfoBundle bundle = (InfoBundle) streamIn.readObject();
         System.out.println(ID + ": " + bundle.getQuestionAnswer());
-        
+        server.getConnectionList().handleCommunication(ID, bundle);
+
       } catch (IOException e) {
         System.out.println(e.getMessage());
       } catch (ClassNotFoundException e) {
@@ -71,10 +71,10 @@ public class ConnectionThread extends Thread {
    * @throws IOException
    */
   public void close () throws IOException {
-    if (socket != null)
-      socket.close();
     if (streamIn != null)
       streamIn.close();
+//    if (socket != null)
+//      socket.close();
   }
 
 

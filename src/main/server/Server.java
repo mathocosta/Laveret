@@ -8,6 +8,14 @@ public class Server {
   private ConnectionList connectionList = null;
 
 
+  /**
+   * @return the connectionList
+   */
+  public ConnectionList getConnectionList () {
+    return connectionList;
+  }
+
+
   public Server (int port) {
     try {
       System.out.println("Iniciando na porta " + port + " aguarde ...");
