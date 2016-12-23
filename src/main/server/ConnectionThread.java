@@ -36,7 +36,7 @@ public class ConnectionThread extends Thread {
       try {
         InfoBundle bundle = (InfoBundle) streamIn.readObject();
         System.out.println(ID + ": " + bundle.getQuestionAnswer());
-
+        
       } catch (IOException e) {
         System.out.println(e.getMessage());
       } catch (ClassNotFoundException e) {
@@ -77,4 +77,18 @@ public class ConnectionThread extends Thread {
       streamIn.close();
   }
 
+
+  /**
+   * Envia uma mensagem para o cliente da conexão feita.
+   * 
+   * @param bundle
+   */
+  // TODO: Fazer o metodo
+  public void send (InfoBundle bundle) {
+    try {
+      streamOut.writeObject(bundle);
+    } catch (IOException e) {
+      System.out.println(ID + " ERRO: " + e.getMessage());
+    }
+  }
 }

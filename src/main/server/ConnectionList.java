@@ -5,6 +5,8 @@ import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.ArrayList;
 
+import main.util.InfoBundle;
+
 /**
  * Objeto com todas as threads de conexões rodando
  */
@@ -53,5 +55,48 @@ public class ConnectionList extends Thread {
       connectionThread.close();
       connectionThread.interrupt();
     }
+  }
+
+
+  /**
+   * Gerencia a comunicação com todos da lista de conexões.
+   * 
+   * @param ID
+   * @param bundle
+   */
+  public synchronized void handleCommunication (int ID, InfoBundle bundle) {
+    if (bundle.getQuestionAnswer().equals(".bye")) {
+      findConnection(ID).send(bundle);
+      remove(ID);
+    } else {
+      for (ConnectionThread connectionThread : connections)
+        connectionThread.send(bundle);
+    }
+  }
+
+
+  /**
+   * Remove um elemento da lista de conexões de acordo com seu ID.
+   * 
+   * @param iD
+   */
+  // TODO: Fazer o metodo
+  private synchronized void remove (int iD) {
+
+  }
+
+
+  /**
+   * Recebe o ID do procurado e retorna o objeto.s
+   * 
+   * @param ID
+   * @return
+   */
+  public ConnectionThread findConnection (int ID) {
+    for (ConnectionThread conn : connections) {
+      if (conn.getID() == ID)
+        return conn;
+    }
+    return null;
   }
 }
