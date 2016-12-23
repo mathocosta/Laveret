@@ -81,13 +81,26 @@ public class ConnectionList extends Thread {
    * @param iD
    */
   // TODO: Fazer o metodo
-  private synchronized void remove (int iD) {
-
+  private synchronized void remove (int ID) {
+    ConnectionThread toRemove = findConnection(ID);
+    if (toRemove != null) {
+      System.out.println("Removendo o cliente " + ID);
+      connections.remove(toRemove);
+      try {
+        toRemove.close();
+        toRemove.interrupt();
+      } catch (IOException e) {
+        System.out.println("Erro em fechar a thread: " + e);
+      }
+      System.out.println("Cliente: " + ID + " removido.");
+      for (ConnectionThread connectionThread : connections) 
+        System.out.println(connectionThread.getID());
+    }
   }
 
 
   /**
-   * Recebe o ID do procurado e retorna o objeto.s
+   * Recebe o ID do procurado e retorna o objetos.
    * 
    * @param ID
    * @return
