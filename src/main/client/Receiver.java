@@ -6,6 +6,12 @@ import java.net.Socket;
 
 import main.util.InfoBundle;
 
+/**
+ * Classe que serve para gerenciar o recebimento de qualquer mensagem vinda do
+ * servidor.
+ * 
+ * Roda em uma outra Thread criada pelo cliente.
+ */
 public class Receiver implements Runnable {
   private Socket socket;
   private SimpleClient client;

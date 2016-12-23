@@ -15,6 +15,7 @@ public class SimpleClient {
   private ObjectOutputStream streamOut = null;
   private Thread receiverThread = null;
 
+
   public SimpleClient (String serverName, int serverPort) {
     System.out.println("Tentando conexão..");
 
@@ -36,6 +37,7 @@ public class SimpleClient {
         streamOut.writeObject(bundle);
       } catch (IOException e) {
         System.out.println("Erro de envio: " + e.getMessage());
+        stop();
       }
     }
   }
@@ -57,18 +59,21 @@ public class SimpleClient {
         streamOut.close();
       if (socket != null)
         socket.close();
-      if (receiverThread != null)
-        receiverThread.interrupt();
     } catch (IOException ioe) {
       System.out.println("Erro encerrando ...");
+    } finally {
+      if (receiverThread != null)
+        receiverThread.interrupt();
+      System.out.println("Desconectado.");
     }
   }
-  
+
+
   public void handleCommunication (InfoBundle receivedBundle) {
     if (receivedBundle.getQuestionAnswer().equals(".bye")) {
-      System.out.println("Desconectando, pressione enter...");
+      System.out.println("Desconectando...");
       stop();
-      
+
     } else {
       System.out.println(receivedBundle.getQuestionAnswer());
     }
