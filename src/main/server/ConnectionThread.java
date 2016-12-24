@@ -31,15 +31,18 @@ public class ConnectionThread extends Thread {
   @Override
   public void run () {
     System.out.println("Connection " + ID + " running");
+
     while (!this.isInterrupted()) {
       try {
         InfoBundle bundle = (InfoBundle) streamIn.readObject();
         System.out.println(ID + ": " + bundle.getQuestionAnswer());
         server.getConnectionList().handleCommunication(ID, bundle);
-
       } catch (IOException e) {
-        System.out.println(e.getMessage());
+        System.out.println("Erro em " + ID + ": " + e.getMessage());
+        server.getConnectionList().remove(ID);
+        interrupt();
       } catch (ClassNotFoundException e) {
+        System.out.println("Erro em " + ID + e.getMessage());
         e.printStackTrace();
       }
     }
@@ -73,8 +76,8 @@ public class ConnectionThread extends Thread {
   public void close () throws IOException {
     if (streamIn != null)
       streamIn.close();
-//    if (socket != null)
-//      socket.close();
+    // if (socket != null)
+    // socket.close();
   }
 
 
