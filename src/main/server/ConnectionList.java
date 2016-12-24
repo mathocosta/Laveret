@@ -50,14 +50,6 @@ public class ConnectionList extends Thread {
   }
 
 
-  public void stopRunning () throws IOException {
-    for (ConnectionThread connectionThread : connections) {
-      connectionThread.close();
-      connectionThread.interrupt();
-    }
-  }
-
-
   /**
    * Gerencia a comunicação com todos da lista de conexões.
    * 
@@ -69,32 +61,9 @@ public class ConnectionList extends Thread {
       findConnection(ID).send(bundle);
       remove(ID);
     } else {
+      bundle.setDestination(ID);
       for (ConnectionThread connectionThread : connections)
         connectionThread.send(bundle);
-    }
-  }
-
-
-  /**
-   * Remove um elemento da lista de conexões de acordo com seu ID.
-   * 
-   * @param iD
-   */
-  // TODO: Fazer o metodo
-  private synchronized void remove (int ID) {
-    ConnectionThread toRemove = findConnection(ID);
-    if (toRemove != null) {
-      System.out.println("Removendo o cliente " + ID);
-      connections.remove(toRemove);
-      try {
-        toRemove.close();
-        toRemove.interrupt();
-      } catch (IOException e) {
-        System.out.println("Erro em fechar a thread: " + e);
-      }
-      System.out.println("Cliente: " + ID + " removido.");
-      for (ConnectionThread connectionThread : connections) 
-        System.out.println(connectionThread.getID());
     }
   }
 
@@ -112,4 +81,38 @@ public class ConnectionList extends Thread {
     }
     return null;
   }
+
+
+  /**
+   * Remove um elemento da lista de conexões de acordo com seu ID.
+   * 
+   * @param ID
+   */
+  public synchronized void remove (int ID) {
+    ConnectionThread toRemove = findConnection(ID);
+    if (toRemove != null) {
+      System.out.println("Removendo o cliente " + ID);
+      connections.remove(toRemove);
+
+      try {
+        toRemove.close();
+        toRemove.interrupt();
+      } catch (IOException e) {
+        System.out.println("Erro em fechar a thread: " + e);
+      }
+
+      System.out.println("Cliente: " + ID + " removido.");
+    } else {
+      System.out.println("Elemento não achado.");
+    }
+  }
+
+
+  public void stopRunning () throws IOException {
+    for (ConnectionThread connectionThread : connections) {
+      connectionThread.close();
+      connectionThread.interrupt();
+    }
+  }
+
 }
