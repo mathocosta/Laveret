@@ -75,7 +75,7 @@ public class SimpleClient {
       stop();
 
     } else {
-      System.out.println(receivedBundle.getDestination() + ": "+ receivedBundle.getQuestionAnswer());
+      System.out.println(receivedBundle.getDestinationIP() + ": "+ receivedBundle.getQuestionAnswer());
     }
   }
 }

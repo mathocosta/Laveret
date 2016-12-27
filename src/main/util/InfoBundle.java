@@ -14,8 +14,7 @@ public class InfoBundle implements Serializable {
   private static final long serialVersionUID = -3896054514926163002L;
   private String questionAnswer;
   private String question;
-  // TODO: Ver se eh melhor isso direto ou somente um inteiro.
-   private int destination;
+   private int destinationIP;
 
   // FIXME: Remover os setters do construtor 
   public InfoBundle (String questionAnswer) {
@@ -43,12 +42,12 @@ public class InfoBundle implements Serializable {
   }
 
 
-  public int getDestination () {
-    return destination;
+  public int getDestinationIP () {
+    return destinationIP;
   }
 
 
-  public void setDestination (int iD) {
-    this.destination = iD;
+  public void setDestinationIP (int IP) {
+    this.destinationIP = IP;
   }
 }

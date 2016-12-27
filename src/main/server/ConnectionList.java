@@ -61,7 +61,7 @@ public class ConnectionList extends Thread {
       findConnection(ID).send(bundle);
       remove(ID);
     } else {
-      bundle.setDestination(ID);
+      bundle.setDestinationIP(ID);
       for (ConnectionThread connectionThread : connections)
         connectionThread.send(bundle);
     }

@@ -86,7 +86,6 @@ public class ConnectionThread extends Thread {
    * 
    * @param bundle
    */
-  // TODO: Fazer o metodo
   public void send (InfoBundle bundle) {
     try {
       streamOut.writeObject(bundle);
