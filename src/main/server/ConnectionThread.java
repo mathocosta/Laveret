@@ -11,12 +11,10 @@ import main.util.InfoBundle;
  * Classe para ser cuidar de cada conexão realizada ao servidor, colocando em
  * sua devida thread.
  */
-// TODO:FIXME: Pesquisar se eh essa a forma certa, bem como senao for, como
-// fazer somente com o Runnable
 public class ConnectionThread extends Thread {
   private Socket socket = null;
   private Server server = null;
-  private int ID = -1;
+  private int identifier = -1;
   private ObjectInputStream streamIn = null;
   private ObjectOutputStream streamOut = null;
 
@@ -24,25 +22,25 @@ public class ConnectionThread extends Thread {
   public ConnectionThread (Server _server, Socket _socket) {
     server = _server;
     socket = _socket;
-    ID = socket.getPort();
+    identifier = socket.getPort();
   }
 
 
   @Override
   public void run () {
-    System.out.println("Connection " + ID + " running");
+    System.out.println("Connection " + identifier + " running");
 
     while (!this.isInterrupted()) {
       try {
         InfoBundle bundle = (InfoBundle) streamIn.readObject();
-        System.out.println(ID + ": " + bundle.getQuestionAnswer());
-        server.getConnectionList().handleCommunication(ID, bundle);
+        System.out.println(identifier + ": " + bundle.getQuestionAnswer());
+        server.getConnectionList().handleCommunication(identifier, bundle);
       } catch (IOException e) {
-        System.out.println("Erro em " + ID + ": " + e.getMessage());
-        server.getConnectionList().remove(ID);
+        System.out.println("Erro em " + identifier + ": " + e.getMessage());
+        server.getConnectionList().remove(identifier);
         interrupt();
       } catch (ClassNotFoundException e) {
-        System.out.println("Erro em " + ID + e.getMessage());
+        System.out.println("Erro em " + identifier + e.getMessage());
         e.printStackTrace();
       }
     }
@@ -52,8 +50,8 @@ public class ConnectionThread extends Thread {
   /**
    * @return the iD
    */
-  public int getID () {
-    return ID;
+  public int getIdentifier () {
+    return identifier;
   }
 
 
@@ -90,7 +88,7 @@ public class ConnectionThread extends Thread {
     try {
       streamOut.writeObject(bundle);
     } catch (IOException e) {
-      System.out.println(ID + " ERRO: " + e.getMessage());
+      System.out.println(identifier + " ERRO: " + e.getMessage());
     }
   }
 }
