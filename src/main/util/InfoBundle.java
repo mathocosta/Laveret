@@ -12,13 +12,15 @@ import java.io.Serializable;
  */
 public class InfoBundle implements Serializable {
   private static final long serialVersionUID = -3896054514926163002L;
-  private String questionAnswer;
   private String question;
-   private int destinationIP;
+  private String questionAnswer;
+  private int destinationIP;
+  private boolean fromServer;
 
-  // FIXME: Remover os setters do construtor 
-  public InfoBundle (String questionAnswer) {
-    this.setQuestionAnswer(questionAnswer);
+
+  public InfoBundle () {
+    this.question = "";
+    this.questionAnswer = "";
   }
 
 
@@ -49,5 +51,15 @@ public class InfoBundle implements Serializable {
 
   public void setDestinationIP (int IP) {
     this.destinationIP = IP;
+  }
+
+
+  public boolean isFromServer () {
+    return fromServer;
+  }
+
+
+  public void setFromServer (boolean fromServer) {
+    this.fromServer = fromServer;
   }
 }
