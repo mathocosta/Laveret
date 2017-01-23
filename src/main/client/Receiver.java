@@ -37,7 +37,10 @@ public class Receiver implements Runnable {
 
   @Override
   public void run () {
-    while (true) {
+    // Como a classe roda em uma propria thread, posso acessa-lá via classe
+    // base e usar o método static 'interrupted', que retorna boolean se está
+    // rodando ainda, para terminar o loop.
+    while (!Thread.interrupted()) {
       try {
         client.handleCommunication((InfoBundle) inStream.readObject());
       } catch (IOException e) {

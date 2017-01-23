@@ -33,26 +33,39 @@ public class SimpleClient {
     while (!line.equals(".bye")) {
       try {
         line = console.readLine();
-        InfoBundle bundle = new InfoBundle(line);
+
+        InfoBundle bundle = new InfoBundle();
+        bundle.setQuestionAnswer(line);
+
         streamOut.writeObject(bundle);
       } catch (IOException e) {
         System.out.println("Erro de envio: " + e.getMessage());
         stop();
       }
     }
+    stop();
   }
 
 
+  /**
+   * Inicia as funcionalidades do cliente.
+   * 
+   * @throws IOException
+   */
   public void start () throws IOException {
     console = new BufferedReader(new InputStreamReader(System.in));
     streamOut = new ObjectOutputStream(socket.getOutputStream());
+
     Receiver receiver = new Receiver(this, socket);
-    new Thread(receiver).start();
+    receiverThread = new Thread(receiver);
+    receiverThread.start();
   }
 
 
   public void stop () {
     try {
+      if (receiverThread != null)
+        receiverThread.interrupt();
       if (console != null)
         console.close();
       if (streamOut != null)
@@ -62,8 +75,6 @@ public class SimpleClient {
     } catch (IOException ioe) {
       System.out.println("Erro encerrando ...");
     } finally {
-      if (receiverThread != null)
-        receiverThread.interrupt();
       System.out.println("Desconectado.");
     }
   }
@@ -75,7 +86,12 @@ public class SimpleClient {
       stop();
 
     } else {
-      System.out.println(receivedBundle.getDestinationIP() + ": "+ receivedBundle.getQuestionAnswer());
+      if (receivedBundle.isFromServer()) {
+        System.out.println("> " + receivedBundle.getQuestion() + " <");
+      } else {
+        System.out.println(receivedBundle.getDestinationIP() + ": "
+            + receivedBundle.getQuestionAnswer());
+      }
     }
   }
 }
