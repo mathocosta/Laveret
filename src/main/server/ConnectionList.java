@@ -14,6 +14,7 @@ public class ConnectionList extends Thread {
   private ServerSocket serverSocket = null;
   private Server server = null;
   private ArrayList<ConnectionThread> connections = null;
+  private ConnectionThread currentConnection = null;
   private boolean isRunning;
 
 
@@ -32,7 +33,6 @@ public class ConnectionList extends Thread {
         isRunning = false;
         break;
       }
-
       try {
         System.out.println("Esperando um cliente...");
         Socket socket = serverSocket.accept();
@@ -46,7 +46,54 @@ public class ConnectionList extends Thread {
       } catch (IOException e) {
         e.printStackTrace();
       }
+
+      if (connections.size() == 2) {
+        InfoBundle namesBundle = new InfoBundle();
+        namesBundle.setQuestion("Defina um nome para seu oponente:");
+        namesBundle.setFromServer(true);
+
+        // envia pra todos o inicio do jogo
+        for (ConnectionThread conn : connections)
+          handleCommunication(conn.getIdentifier(), namesBundle);
+
+        // inicia jogo
+        handleTurn(0);
+        InfoBundle initialBundle = new InfoBundle();
+        initialBundle.setFromServer(true);
+        initialBundle.setQuestion("Escreva a pergunta");
+        handleCommunication(currentConnection.getIdentifier(), initialBundle);
+      }
     }
+  }
+
+
+  /**
+   * Gerencia a vez de jogar. Decide quem será o próximo o jogar.
+   * 
+   * @param currentPlayerID
+   */
+  public synchronized void handleTurn (int currentPlayerID) {
+    // 1ra jogada, iniciando com o primeiro na lista.
+    if (currentPlayerID == 0) {
+      currentConnection = connections.get(currentPlayerID);
+      // demais jogadas
+    } else {
+      currentConnection = findConnection(currentPlayerID);
+      int index = connections.indexOf(currentConnection);
+      currentConnection = connections.get(index + 1);
+    }
+
+    System.out.println("Proximo a jogar: " + currentConnection.getIdentifier());
+  }
+
+
+  /**
+   * Executa a jogada com o player atual.
+   * 
+   * @param conn
+   */
+  public void turn (ConnectionThread conn) {
+
   }
 
 
@@ -57,14 +104,23 @@ public class ConnectionList extends Thread {
    * @param bundle
    */
   public synchronized void handleCommunication (int ID, InfoBundle bundle) {
-    if (bundle.getQuestionAnswer().equals(".bye")) {
-      findConnection(ID).send(bundle);
-      remove(ID);
-    } else {
+    // if (bundle.getQuestionAnswer().equals(".bye")) {
+    // findConnection(ID).send(bundle);
+    // remove(ID);
+    // } else {
+    // if (!bundle.isFromServer())
+    // bundle.setDestinationIP(ID);
+    // for (ConnectionThread connectionThread : connections)
+    // if (connectionThread.getIdentifier() != ID)
+    // connectionThread.send(bundle);
+    // }
+    if (!bundle.isFromServer())
       bundle.setDestinationIP(ID);
-      for (ConnectionThread connectionThread : connections)
-        connectionThread.send(bundle);
-    }
+
+    findConnection(ID).send(bundle);
+
+    if (bundle.getQuestionAnswer().equals(".bye"))
+      remove(ID);
   }
 
 
@@ -76,7 +132,7 @@ public class ConnectionList extends Thread {
    */
   public ConnectionThread findConnection (int ID) {
     for (ConnectionThread conn : connections) {
-      if (conn.getID() == ID)
+      if (conn.getIdentifier() == ID)
         return conn;
     }
     return null;
