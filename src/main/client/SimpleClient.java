@@ -1,18 +1,16 @@
 package main.client;
 
 import java.io.BufferedReader;
+import java.io.DataOutputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.io.ObjectOutputStream;
 import java.net.Socket;
 import java.net.UnknownHostException;
-
-import main.util.InfoBundle;
 
 public class SimpleClient {
   private Socket socket = null;
   private BufferedReader console = null;
-  private ObjectOutputStream streamOut = null;
+  private DataOutputStream streamOut = null;
   private Thread receiverThread = null;
 
 
@@ -34,10 +32,11 @@ public class SimpleClient {
       try {
         line = console.readLine();
 
-        InfoBundle bundle = new InfoBundle();
-        bundle.setQuestionAnswer(line);
+        if (!line.equals(".bye")) {
+          streamOut.writeFloat(Float.parseFloat(line));
+          streamOut.flush();
+        }
 
-        streamOut.writeObject(bundle);
       } catch (IOException e) {
         System.out.println("Erro de envio: " + e.getMessage());
         stop();
@@ -54,7 +53,7 @@ public class SimpleClient {
    */
   public void start () throws IOException {
     console = new BufferedReader(new InputStreamReader(System.in));
-    streamOut = new ObjectOutputStream(socket.getOutputStream());
+    streamOut = new DataOutputStream(socket.getOutputStream());
 
     Receiver receiver = new Receiver(this, socket);
     receiverThread = new Thread(receiver);
@@ -66,8 +65,9 @@ public class SimpleClient {
     try {
       if (receiverThread != null)
         receiverThread.interrupt();
-      if (console != null)
-        console.close();
+      // FIXME: Encerra a conexão, mas não termina o programa.
+      // if (console != null)
+      // console.close();
       if (streamOut != null)
         streamOut.close();
       if (socket != null)
@@ -80,18 +80,12 @@ public class SimpleClient {
   }
 
 
-  public void handleCommunication (InfoBundle receivedBundle) {
-    if (receivedBundle.getQuestionAnswer().equals(".bye")) {
+  public void handleCommunication (String sentence) {
+    if (sentence.equals(".bye")) {
       System.out.println("Desconectando...");
       stop();
-
     } else {
-      if (receivedBundle.isFromServer()) {
-        System.out.println("> " + receivedBundle.getQuestion() + " <");
-      } else {
-        System.out.println(receivedBundle.getDestinationIP() + ": "
-            + receivedBundle.getQuestionAnswer());
-      }
+      System.out.println(sentence);
     }
   }
 }

@@ -1,10 +1,8 @@
 package main.client;
 
+import java.io.DataInputStream;
 import java.io.IOException;
-import java.io.ObjectInputStream;
 import java.net.Socket;
-
-import main.util.InfoBundle;
 
 /**
  * Classe que serve para gerenciar o recebimento de qualquer mensagem vinda do
@@ -15,7 +13,7 @@ import main.util.InfoBundle;
 public class Receiver implements Runnable {
   private Socket socket;
   private SimpleClient client;
-  private ObjectInputStream inStream;
+  private DataInputStream inStream;
 
 
   /**
@@ -27,7 +25,7 @@ public class Receiver implements Runnable {
     this.client = _client;
 
     try {
-      inStream = new ObjectInputStream(socket.getInputStream());
+      inStream = new DataInputStream(socket.getInputStream());
     } catch (IOException e) {
       System.out.println("Erro em pegar o InputStream: " + e);
       client.stop();
@@ -42,11 +40,8 @@ public class Receiver implements Runnable {
     // rodando ainda, para terminar o loop.
     while (!Thread.interrupted()) {
       try {
-        client.handleCommunication((InfoBundle) inStream.readObject());
+        client.handleCommunication(inStream.readUTF());
       } catch (IOException e) {
-        System.out.println(e.getMessage());
-        client.stop();
-      } catch (ClassNotFoundException e) {
         System.out.println(e.getMessage());
         client.stop();
       }
