@@ -1,11 +1,9 @@
 package main.server;
 
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
 import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
 import java.net.Socket;
-
-import main.util.InfoBundle;
 
 /**
  * Classe para ser cuidar de cada conexão realizada ao servidor, colocando em
@@ -15,8 +13,8 @@ public class ConnectionThread extends Thread {
   private Socket socket = null;
   private Server server = null;
   private int identifier = -1;
-  private ObjectInputStream streamIn = null;
-  private ObjectOutputStream streamOut = null;
+  private DataInputStream streamIn = null;
+  private DataOutputStream streamOut = null;
 
 
   public ConnectionThread (Server _server, Socket _socket) {
@@ -32,23 +30,20 @@ public class ConnectionThread extends Thread {
 
     while (!this.isInterrupted()) {
       try {
-        InfoBundle bundle = (InfoBundle) streamIn.readObject();
-        System.out.println(identifier + ": " + bundle.getQuestionAnswer());
-        server.getConnectionList().handleCommunication(identifier, bundle);
+        float number = streamIn.readFloat();
+        System.out.println(identifier + ": " + number);
+        server.getConnectionList().handleCommunication(identifier, number);
       } catch (IOException e) {
         System.out.println("Erro em " + identifier + ": " + e.getMessage());
         server.getConnectionList().remove(identifier);
         interrupt();
-      } catch (ClassNotFoundException e) {
-        System.out.println("Erro em " + identifier + e.getMessage());
-        e.printStackTrace();
       }
     }
   }
 
 
   /**
-   * @return the iD
+   * @return the identifier
    */
   public int getIdentifier () {
     return identifier;
@@ -61,8 +56,8 @@ public class ConnectionThread extends Thread {
    * @throws IOException
    */
   public void open () throws IOException {
-    streamIn = new ObjectInputStream(socket.getInputStream());
-    streamOut = new ObjectOutputStream(socket.getOutputStream());
+    streamIn = new DataInputStream(socket.getInputStream());
+    streamOut = new DataOutputStream(socket.getOutputStream());
   }
 
 
@@ -74,19 +69,18 @@ public class ConnectionThread extends Thread {
   public void close () throws IOException {
     if (streamIn != null)
       streamIn.close();
-    // if (socket != null)
-    // socket.close();
   }
 
 
   /**
    * Envia uma mensagem para o cliente da conexão feita.
    * 
-   * @param bundle
+   * @param answer
    */
-  public void send (InfoBundle bundle) {
+  public void send (String answer) {
     try {
-      streamOut.writeObject(bundle);
+      streamOut.writeUTF(answer);
+      streamOut.flush();
     } catch (IOException e) {
       System.out.println(identifier + " ERRO: " + e.getMessage());
     }
