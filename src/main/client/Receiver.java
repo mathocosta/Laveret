@@ -8,7 +8,8 @@ import java.net.Socket;
  * Classe que serve para gerenciar o recebimento de qualquer mensagem vinda do
  * servidor.
  * 
- * Roda em uma outra Thread criada pelo cliente.
+ * Roda em uma outra Thread criada pelo cliente, para poder receber as mensagens
+ * em tempo real.
  */
 public class Receiver implements Runnable {
   private Socket socket;
