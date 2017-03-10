@@ -5,6 +5,7 @@ import java.io.DataOutputStream;
 import java.io.IOException;
 import java.net.Socket;
 
+
 /**
  * Classe para ser cuidar de cada conexão realizada ao servidor, colocando em
  * sua devida thread.
@@ -18,9 +19,9 @@ public class ConnectionThread extends Thread {
 
 
   public ConnectionThread (Server _server, Socket _socket) {
-    server = _server;
-    socket = _socket;
-    identifier = socket.getPort();
+    this.server = _server;
+    this.socket = _socket;
+    this.identifier = socket.getPort();
   }
 
 
@@ -30,7 +31,7 @@ public class ConnectionThread extends Thread {
 
     while (!this.isInterrupted()) {
       try {
-        float number = streamIn.readFloat();
+        int number = streamIn.readInt();
         System.out.println(identifier + ": " + number);
         server.getConnectionList().handleCommunication(identifier, number);
       } catch (IOException e) {

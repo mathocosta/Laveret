@@ -6,7 +6,7 @@ import java.net.Socket;
 import java.util.ArrayList;
 
 /**
- * Objeto com todas as threads de conexões rodando
+ * Objeto com todas as threads de conexões rodando.
  */
 public class ConnectionList extends Thread {
   private ServerSocket serverSocket = null;
@@ -54,31 +54,34 @@ public class ConnectionList extends Thread {
    * @param ID
    * @param bundle
    */
-  public synchronized void handleCommunication (int ID, float number) {
+  public synchronized void handleCommunication (int ID, int number) {
     float resposta = server.getSortedNumber();
 
+    // Envia para todos conectados.
     for (ConnectionThread conn : connections) {
       if (conn.getIdentifier() != ID)
-        conn.send(ID + " tentou: " + number);
+        conn.send(ID + " tentou: " + number + "\n");
     }
 
     String tip = "";
     if (number == resposta) {
-      tip = "Você acertou!!";
+      tip = "=";
+
       for (ConnectionThread conn : connections) {
         if (conn.getIdentifier() == ID)
           conn.send(tip);
         else
-          conn.send("Conexão " + ID + " acertou, fim de jogo.");
-        
+          conn.send("Conexão " + ID + " acertou, fim de jogo.\n");
+
         conn.send(".bye");
       }
+
       server.stop();
     } else {
       if (number > resposta)
-        tip = "menor";
+        tip = "-";
       else
-        tip = "maior";
+        tip = "+";
     }
 
     findConnection(ID).send(tip);

@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.net.ServerSocket;
 import java.util.Random;
 
+
 public class Server {
   private ServerSocket server = null;
   private ConnectionList connectionList = null;
@@ -11,7 +12,7 @@ public class Server {
 
 
   /**
-   * @return the connectionList
+   * @return connectionList
    */
   public ConnectionList getConnectionList () {
     return connectionList;
@@ -50,13 +51,13 @@ public class Server {
 
 
   /**
-   * Gera um número randomicamente entre 1 e 100, e retorna ele.
+   * Gera um número inteiro randomicamente entre 1 e 100, e retorna ele.
    * 
-   * @return
+   * @return float
    */
-  public float generateRandomNumber () {
+  public int generateRandomNumber () {
     Random rn = new Random();
-    float num = (float) rn.nextInt((100 - 1) + 1) + 1;
+    int num = rn.nextInt((100 - 1) + 1) + 1;
     return num;
   }
 
@@ -65,8 +66,8 @@ public class Server {
     return sortedNumber;
   }
 
-  // main para não precisar do 'TesteServer.java'
-  // public static void main (String[] args) {
-  // new Server(12345);
-  // }
+
+  public static void main (String[] args) {
+    new Server(12345);
+  }
 }
