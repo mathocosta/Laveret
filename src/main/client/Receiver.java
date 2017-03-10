@@ -4,6 +4,7 @@ import java.io.DataInputStream;
 import java.io.IOException;
 import java.net.Socket;
 
+
 /**
  * Classe que serve para gerenciar o recebimento de qualquer mensagem vinda do
  * servidor.
@@ -13,7 +14,7 @@ import java.net.Socket;
  */
 public class Receiver implements Runnable {
   private Socket socket;
-  private SimpleClient client;
+  private Client client;
   private DataInputStream inStream;
 
 
@@ -21,7 +22,7 @@ public class Receiver implements Runnable {
    * @param _client
    * @param _socket
    */
-  public Receiver (SimpleClient _client, Socket _socket) {
+  public Receiver (Client _client, Socket _socket) {
     this.socket = _socket;
     this.client = _client;
 
