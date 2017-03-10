@@ -64,8 +64,6 @@ public class AppWindow {
     gamePanel = new GamePanel(this);
     contentPane.add(gamePanel, "gamePanel");
 
-    // TEST:
-    changeContentPanel("gamePanel");
   }
 
 
