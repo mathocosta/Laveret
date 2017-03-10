@@ -105,6 +105,7 @@ public class GamePanel extends JPanel {
     return new ActionListener() {
       public void actionPerformed (ActionEvent ev) {
         appWindow.getClient().send(numberField.getText());
+        numberField.setText("");
       }
     };
   }
